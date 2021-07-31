@@ -50,20 +50,27 @@ class FlightsService
             $response = Cache::get('flights_outbound');
         }
         return $response;
+
     }
 
     public function groupFlights()
     {
-        $groups = $this->processOutbounds();
+        if(!Cache::has('processed_flights')){
+            $groups = $this->processOutbounds();
 
-        $groups = $this->processInbounds($groups);
+            $groups = $this->processInbounds($groups);
+
+            usort($groups, function ($a, $b) {
+                return $a['totalPrice'] <=> $b['totalPrice'];
+            });
+            Cache::put('processed_flights',$groups,now()->addMinutes(20));
+        }else{
+            $groups = Cache::get('processed_flights');
+        }
         $output = [];
         foreach ($groups as $item) {
             $output[$item['uniqueId']] = $item['totalPrice'];
         }
-        usort($groups, function ($a, $b) {
-            return $a['totalPrice'] <=> $b['totalPrice'];
-        });
         return [
             'groups' => $groups,
             'cheapestPrice' => $output[array_keys($output, min($output))[0]],
