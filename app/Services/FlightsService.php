@@ -11,21 +11,18 @@ class FlightsService
     public function getFlights()
     {
         $flights = array_merge($this->getOutboundFlights(),$this->getInboundFlights());
-        $groups = $this->groupFlights();
+        $getGroups = $this->groupFlights();
 
 
-        $output = [];
-        foreach($groups as $item) {
-                $output[$item['uniqueId']] =  $item['totalPrice'];
-        }
+
 
         $return = [
             'flights'=>$flights,
-            'groups'=>$groups,
-            'total_groups'=>count($groups),
+            'groups'=>$getGroups['groups'],
+            'total_groups'=>count($getGroups['groups']),
             'total_flights'=>count($flights),
-            'cheapestPrice'=>$output[array_keys($output, min($output))[0]],
-            'cheapestGroup'=>array_keys($output, min($output))[0]
+            'cheapestPrice'=>$getGroups['cheapestPrice'],
+            'cheapestGroup'=>$getGroups['cheapestGroup']
         ];
         return $return;
     }
@@ -61,8 +58,15 @@ class FlightsService
         $groups = $this->processOutbounds();
 
         $groups = $this->processInbounds($groups);
-
-        return $groups;
+        $output = [];
+        foreach($groups as $item) {
+            $output[$item['uniqueId']] =  $item['totalPrice'];
+        }
+        return [
+            'groups'=>$groups,
+            'cheapestPrice'=>$output[array_keys($output, min($output))[0]],
+            'cheapestGroup'=>array_keys($output, min($output))[0]
+        ];
     }
 
     public function processInbounds($groups) //O(n²)
