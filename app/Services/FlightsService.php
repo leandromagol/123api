@@ -10,19 +10,17 @@ class FlightsService
 {
     public function getFlights()
     {
-        $flights = array_merge($this->getOutboundFlights(),$this->getInboundFlights());
+        $flights = array_merge($this->getOutboundFlights(), $this->getInboundFlights());
         $getGroups = $this->groupFlights();
 
 
-
-
         $return = [
-            'flights'=>$flights,
-            'groups'=>$getGroups['groups'],
-            'total_groups'=>count($getGroups['groups']),
-            'total_flights'=>count($flights),
-            'cheapestPrice'=>$getGroups['cheapestPrice'],
-            'cheapestGroup'=>$getGroups['cheapestGroup']
+            'flights' => $flights,
+            'groups' => $getGroups['groups'],
+            'total_groups' => count($getGroups['groups']),
+            'total_flights' => count($flights),
+            'cheapestPrice' => $getGroups['cheapestPrice'],
+            'cheapestGroup' => $getGroups['cheapestGroup']
         ];
         return $return;
     }
@@ -40,6 +38,7 @@ class FlightsService
         }
         return $response;
     }
+
     public function getOutboundFlights()
     {
         if (!Cache::has('flights_outbound')) {
@@ -59,20 +58,23 @@ class FlightsService
 
         $groups = $this->processInbounds($groups);
         $output = [];
-        foreach($groups as $item) {
-            $output[$item['uniqueId']] =  $item['totalPrice'];
+        foreach ($groups as $item) {
+            $output[$item['uniqueId']] = $item['totalPrice'];
         }
+        usort($groups, function ($a, $b) {
+            return $a['totalPrice'] > $b['totalPrice'];
+        });
         return [
-            'groups'=>$groups,
-            'cheapestPrice'=>$output[array_keys($output, min($output))[0]],
-            'cheapestGroup'=>array_keys($output, min($output))[0]
+            'groups' => $groups,
+            'cheapestPrice' => $output[array_keys($output, min($output))[0]],
+            'cheapestGroup' => array_keys($output, min($output))[0]
         ];
     }
 
     public function processInbounds($groups) //O(n²)
     {
         $inboundFlights = $this->getInboundFlights();
-        foreach ($groups as $key=>$group) {
+        foreach ($groups as $key => $group) {
             foreach ($inboundFlights as $inboundFlight) {
                 if ($group['outbound'][0]['fare'] == $inboundFlight['fare']) {
                     if (count($groups[$key]['inbound']) > 0) {
@@ -81,7 +83,7 @@ class FlightsService
                             $groups[$key]['totalPrice'] = $group['outbound'][0]['price'] + $inboundFlight['price'];
                             array_push($groups[$key]['inbound'], $inboundFlight);
                         }
-                    }else{
+                    } else {
                         $groups[$key]['totalPrice'] = $group['outbound'][0]['price'] + $inboundFlight['price'];
                         array_push($groups[$key]['inbound'], $inboundFlight);
                     }
@@ -113,6 +115,7 @@ class FlightsService
         }
         return $groups;
     }
+
     public function groupExists($groups, $newGroup): array
     {
         foreach ($groups as $key => $group) {
