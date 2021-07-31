@@ -62,7 +62,7 @@ class FlightsService
             $output[$item['uniqueId']] = $item['totalPrice'];
         }
         usort($groups, function ($a, $b) {
-            return $a['totalPrice'] > $b['totalPrice'];
+            return $a['totalPrice'] <=> $b['totalPrice'];
         });
         return [
             'groups' => $groups,
