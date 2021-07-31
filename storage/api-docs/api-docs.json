@@ -1,0 +1,23 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Flights Api",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/flights": {
+            "get": {
+                "description": "Get flights",
+                "operationId": "bad57b7c57d91e00a86a41ba87b47523",
+                "responses": {
+                    "default": {
+                        "description": "Return all flights, flights organized in groups with the same price and fare"
+                    }
+                }
+            }
+        }
+    },
+    "security": [
+        []
+    ]
+}
