@@ -62,6 +62,8 @@ class FlightsService
                     }
                 }
             }
+            
+           Cache::add('processed_flights', $this->groups, now()->addMinutes(20));
         }else{
             $this->groups = Cache::get('processed_flights');
         }
