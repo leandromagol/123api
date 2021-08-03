@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Services\FlightsService;
+use App\Services\V2\FlightsService;
 
 class FlightsController
 {

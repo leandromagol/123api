@@ -21,7 +21,7 @@ Route::get('/',function (){
     return 'welcome';
 });
 Route::get('testservice',function (){
-        $flightService = app(App\Services\FlightsService::class);
-        return ($flightService->groupFlights());
+        $flightService = app(App\Services\V2\FlightsService::class);
+        return ($flightService->getGroups());
 });
 Route::get('flights','FlightsController@index')->name('flights');
